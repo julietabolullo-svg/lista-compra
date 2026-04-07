@@ -794,7 +794,7 @@
 // ──────────────────────────────────────────────
 const SUPABASE_URL = 'https://xkrudevefbyghwlgsuux.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xPXtGnwI0F9PJQLnrXxqMQ_0gLN6iIK';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ──────────────────────────────────────────────
 // CATEGORIES
@@ -1131,7 +1131,7 @@ function initSetup() {
         const lname = document.getElementById('input-listname').value.trim() || 'Mi lista';
         listId = genId();
         listName = lname;
-        const { error } = await supabase.from('listas').insert({ id: listId, nombre: listName });
+        const { error } = await db.from('listas').insert({ id: listId, nombre: listName });
         if (error) throw error;
         location.hash = listId;
         await startApp();
@@ -1157,7 +1157,7 @@ function initSetup() {
 // ──────────────────────────────────────────────
 async function startApp() {
   // Fetch list info
-  const { data: listData } = await supabase.from('listas').select('*').eq('id', listId).single();
+  const { data: listData } = await db.from('listas').select('*').eq('id', listId).single();
   if (listData) listName = listData.nombre;
 
   document.getElementById('screen-setup').style.display = 'none';
@@ -1186,13 +1186,13 @@ async function startApp() {
 // SUPABASE ITEMS
 // ──────────────────────────────────────────────
 async function loadItems() {
-  const { data } = await supabase.from('items_compra').select('*').eq('lista_id', listId).order('created_at');
+  const { data } = await db.from('items_compra').select('*').eq('lista_id', listId).order('created_at');
   items = data || [];
   renderLista();
 }
 
 async function addItem(nombre, categoria, cantidad) {
-  const { data, error } = await supabase.from('items_compra').insert({
+  const { data, error } = await db.from('items_compra').insert({
     lista_id: listId,
     nombre,
     categoria: categoria || 'otros',
@@ -1214,7 +1214,7 @@ async function toggleItem(id) {
   item.comprado = newVal;
   item.comprado_por = newVal ? userName : null;
   renderLista();
-  await supabase.from('items_compra').update({
+  await db.from('items_compra').update({
     comprado: newVal,
     comprado_por: newVal ? userName : null
   }).eq('id', id);
