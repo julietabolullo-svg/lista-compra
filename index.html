@@ -1226,7 +1226,7 @@ async function toggleItem(id) {
 function subscribeRealtime() {
   if (realtimeChannel) realtimeChannel.unsubscribe();
 
-  realtimeChannel = supabase
+  realtimeChannel = db
     .channel('lista-' + listId)
     .on('postgres_changes', {
       event: '*',
